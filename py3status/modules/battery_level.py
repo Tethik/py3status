@@ -47,13 +47,15 @@ class Py3status:
 
         #  Example acpi raw output:  "Battery 0: Discharging, 43%, 00:59:20 remaining"
         acpi_raw = subprocess.check_output(["acpi"], stderr=subprocess.STDOUT)
-        acpi_clean = acpi_raw.translate(None, ',')
+        #print(acpi_raw)
+        acpi_clean = acpi_raw.decode("utf-8").replace(",", "")
+        # acpi_clean = acpi_raw.translate(None, ',')
 
         #  Example list: ['Battery', '0:', 'Discharging', '43%', '00:59:20', 'remaining']
         acpi_list = acpi_clean.split(' ')
 
         charging = True if acpi_list[2] == "Charging" else False
-        percent_charged = int(acpi_list[3].translate(None, '%'))
+        percent_charged = int(acpi_list[3].replace("%", ""))
 
         self.time_remaining = ' '.join(acpi_list[4:])
         battery_full = False
@@ -112,3 +114,14 @@ class Py3status:
                 stdout=open('/dev/null', 'w'),
                 stderr=open('/dev/null', 'w')
             )
+
+
+if __name__ == "__main__":
+    """
+    Test this module by calling it directly.
+    """
+    from time import sleep
+    x = Py3status()
+    while True:
+        print(x.battery_level([], {}))
+        sleep(1)
